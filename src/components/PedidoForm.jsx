@@ -133,6 +133,24 @@ export default function PedidoForm({ pedido, pedidos, onCerrar, onGuardado }) {
     }
   }
 
+  async function borrar() {
+    const ok = window.confirm(
+      `¿Eliminar el pedido de "${pedido.cliente_nombre}"?\nEsta acción no se puede deshacer.`
+    )
+    if (!ok) return
+    setError(null)
+    setGuardando(true)
+    try {
+      const { error: errDel } = await supabase.from('pedidos').delete().eq('id', pedido.id)
+      if (errDel) throw errDel
+      onGuardado()
+    } catch (err) {
+      console.error(err)
+      setError('No se pudo eliminar: ' + (err.message || err))
+      setGuardando(false)
+    }
+  }
+
   return (
     <div className="modal-overlay" onClick={onCerrar}>
       <div className="modal-form" onClick={(e) => e.stopPropagation()}>
@@ -272,6 +290,17 @@ export default function PedidoForm({ pedido, pedidos, onCerrar, onGuardado }) {
               {guardando ? 'Guardando…' : editando ? 'Guardar cambios' : 'Guardar pedido'}
             </button>
           </div>
+
+          {editando && (
+            <button
+              type="button"
+              className="btn btn-eliminar"
+              onClick={borrar}
+              disabled={guardando}
+            >
+              🗑 Eliminar pedido
+            </button>
+          )}
         </form>
       </div>
     </div>

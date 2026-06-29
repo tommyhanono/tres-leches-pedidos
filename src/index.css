@@ -550,6 +550,13 @@ button {
 .form-acciones .btn {
   flex: 1;
 }
+.btn-eliminar {
+  width: 100%;
+  margin-top: 14px;
+  background: var(--error-bg);
+  color: var(--error);
+  border: 1px solid #f3b4ae;
+}
 
 /* ── Modal de imagen ────────────────────────────────────────── */
 .modal-imagen {
