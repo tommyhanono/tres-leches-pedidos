@@ -26,3 +26,7 @@ npm-debug.log*
 *.njsproj
 *.sln
 *.sw?
+
+# Vercel
+.vercel
+.env*

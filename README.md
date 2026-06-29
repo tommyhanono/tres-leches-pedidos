@@ -90,8 +90,8 @@ Yappy, el texto de la causa y la sensibilidad del detector de duplicados (`UMBRA
 
 ## 🔗 Links
 
-- **Repo:** https://github.com/tommyhanono/tres-leches-pedidos (privado)
-- **App (deploy):** pega aquí la URL de Vercel una vez desplegada.
+- **App (deploy):** https://tres-leches-pedidos.vercel.app
+- **Repo:** https://github.com/tommyhanono/tres-leches-pedidos
 
 ## 🔒 Nota de seguridad
 
