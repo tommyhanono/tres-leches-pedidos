@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 import PedidoCard from './PedidoCard'
 import { formatoMoneda, exportarCSV } from '../lib/utils'
+import { COSTO_UNITARIO } from '../config'
 
 export default function Dashboard({
   pedidos,
@@ -16,9 +17,12 @@ export default function Dashboard({
   const totales = useMemo(() => {
     const total = pedidos.length
     const recaudado = pedidos.reduce((s, p) => s + (Number(p.monto) || 0), 0)
+    const unidades = pedidos.reduce((s, p) => s + (Number(p.cantidad) || 0), 0)
+    const costos = unidades * COSTO_UNITARIO
+    const ganancia = recaudado - costos
     const pendientes = pedidos.filter((p) => p.estado_entrega !== 'entregado').length
     const entregados = total - pendientes
-    return { total, recaudado, pendientes, entregados }
+    return { total, recaudado, costos, ganancia, pendientes, entregados }
   }, [pedidos])
 
   const visibles = useMemo(() => {
@@ -38,10 +42,6 @@ export default function Dashboard({
           <span className="contador-num">{totales.total}</span>
           <span className="contador-lbl">Pedidos</span>
         </div>
-        <div className="contador contador-dinero">
-          <span className="contador-num">{formatoMoneda(totales.recaudado)}</span>
-          <span className="contador-lbl">Recaudado</span>
-        </div>
         <div className="contador">
           <span className="contador-num">{totales.pendientes}</span>
           <span className="contador-lbl">Pendientes</span>
@@ -49,6 +49,18 @@ export default function Dashboard({
         <div className="contador">
           <span className="contador-num">{totales.entregados}</span>
           <span className="contador-lbl">Entregados</span>
+        </div>
+        <div className="contador contador-dinero">
+          <span className="contador-num">{formatoMoneda(totales.recaudado)}</span>
+          <span className="contador-lbl">Recaudado</span>
+        </div>
+        <div className="contador">
+          <span className="contador-num">{formatoMoneda(totales.costos)}</span>
+          <span className="contador-lbl">Costos</span>
+        </div>
+        <div className="contador contador-ganancia">
+          <span className="contador-num">{formatoMoneda(totales.ganancia)}</span>
+          <span className="contador-lbl">Ganancia</span>
         </div>
       </section>
 

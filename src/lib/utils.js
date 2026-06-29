@@ -1,6 +1,7 @@
 // ─────────────────────────────────────────────────────────────
 //  Utilidades varias
 // ─────────────────────────────────────────────────────────────
+import { COSTO_UNITARIO } from '../config'
 
 export function formatoMoneda(monto) {
   const n = Number(monto) || 0
@@ -35,23 +36,31 @@ export function exportarCSV(pedidos) {
     'Direccion',
     'Cantidad',
     'Monto',
+    'Costo',
+    'Ganancia',
     'Metodo pago',
     'Estado',
     'Entregado at',
     'Comprobante URL',
   ]
 
-  const filas = pedidos.map((p) => [
-    formatoFecha(p.created_at),
-    p.cliente_nombre,
-    p.direccion,
-    p.cantidad,
-    Number(p.monto).toFixed(2),
-    p.metodo_pago || 'yappy',
-    p.estado_entrega,
-    p.entregado_at ? formatoFecha(p.entregado_at) : '',
-    p.comprobante_url || '',
-  ])
+  const filas = pedidos.map((p) => {
+    const monto = Number(p.monto) || 0
+    const costo = (Number(p.cantidad) || 0) * COSTO_UNITARIO
+    return [
+      formatoFecha(p.created_at),
+      p.cliente_nombre,
+      p.direccion,
+      p.cantidad,
+      monto.toFixed(2),
+      costo.toFixed(2),
+      (monto - costo).toFixed(2),
+      p.metodo_pago || 'yappy',
+      p.estado_entrega,
+      p.entregado_at ? formatoFecha(p.entregado_at) : '',
+      p.comprobante_url || '',
+    ]
+  })
 
   const csv = [cabeceras, ...filas]
     .map((fila) => fila.map(campoCSV).join(','))

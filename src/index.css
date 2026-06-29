@@ -161,6 +161,13 @@ button {
   background: linear-gradient(135deg, var(--crema-2), var(--caramelo));
   border-color: var(--caramelo);
 }
+.contador-ganancia {
+  background: linear-gradient(135deg, var(--ok-bg), #b6ddbe);
+  border-color: var(--ok);
+}
+.contador-ganancia .contador-num {
+  color: var(--ok);
+}
 .contador-num {
   display: block;
   font-size: 26px;
@@ -614,7 +621,7 @@ button {
 
 @media (min-width: 560px) {
   .contadores {
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(3, 1fr);
   }
   .modal-overlay {
     align-items: center;
