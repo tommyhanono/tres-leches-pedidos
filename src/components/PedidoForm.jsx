@@ -4,23 +4,30 @@ import { PRECIO_UNITARIO, YAPPY_NOMBRE, YAPPY_NUMERO, UMBRAL_DUPLICADO } from '.
 import { calcularHash, distanciaHamming } from '../lib/ahash'
 import { formatoMoneda } from '../lib/utils'
 
-export default function NuevoPedido({ pedidos, onCerrar, onCreado }) {
-  const [cliente, setCliente] = useState('')
-  const [direccion, setDireccion] = useState('')
-  const [cantidad, setCantidad] = useState(1)
-  const [monto, setMonto] = useState(PRECIO_UNITARIO)
-  const [montoEditado, setMontoEditado] = useState(false)
-  const [metodoPago, setMetodoPago] = useState('yappy') // 'yappy' | 'efectivo'
+// `pedido` presente = modo edición. Ausente = nuevo pedido.
+export default function PedidoForm({ pedido, pedidos, onCerrar, onGuardado }) {
+  const editando = Boolean(pedido)
 
-  const [archivo, setArchivo] = useState(null)
-  const [previewUrl, setPreviewUrl] = useState(null)
+  const [cliente, setCliente] = useState(pedido?.cliente_nombre || '')
+  const [direccion, setDireccion] = useState(pedido?.direccion || '')
+  const [cantidad, setCantidad] = useState(pedido?.cantidad ?? 1)
+  const [monto, setMonto] = useState(pedido ? pedido.monto : PRECIO_UNITARIO)
+  // En edición no recalculamos el monto solo: respetamos lo que ya estaba.
+  const [montoEditado, setMontoEditado] = useState(editando)
+  const [metodoPago, setMetodoPago] = useState(pedido?.metodo_pago || 'yappy')
+
+  const [archivo, setArchivo] = useState(null) // nuevo archivo elegido
+  const [previewUrl, setPreviewUrl] = useState(null) // preview del nuevo archivo
   const [hash, setHash] = useState(null)
+  // Comprobante ya guardado que conservamos (solo en edición).
+  const [comprobanteActual, setComprobanteActual] = useState(pedido?.comprobante_url || null)
   const [aviso, setAviso] = useState(null) // {nombre} si parece duplicado
 
   const [guardando, setGuardando] = useState(false)
   const [error, setError] = useState(null)
 
-  // Cantidad cambia → recalcular monto salvo que el usuario lo haya editado a mano.
+  const mostrarPreview = previewUrl || comprobanteActual
+
   function cambiarCantidad(valor) {
     const n = Math.max(1, parseInt(valor || '1', 10) || 1)
     setCantidad(n)
@@ -35,24 +42,19 @@ export default function NuevoPedido({ pedidos, onCerrar, onCreado }) {
   async function cambiarArchivo(e) {
     const file = e.target.files?.[0]
     setAviso(null)
-    if (!file) {
-      setArchivo(null)
-      setPreviewUrl(null)
-      setHash(null)
-      return
-    }
+    if (!file) return
     setArchivo(file)
     setPreviewUrl(URL.createObjectURL(file))
 
-    // Calcular hash perceptual y comparar con los ya registrados.
+    // Hash perceptual y comparación con los demás pedidos (excluye el actual).
     const h = await calcularHash(file)
     setHash(h)
     if (h) {
       let parecido = null
       for (const p of pedidos) {
+        if (editando && p.id === pedido.id) continue
         if (!p.comprobante_hash) continue
-        const d = distanciaHamming(h, p.comprobante_hash)
-        if (d <= UMBRAL_DUPLICADO) {
+        if (distanciaHamming(h, p.comprobante_hash) <= UMBRAL_DUPLICADO) {
           parecido = p
           break
         }
@@ -65,6 +67,7 @@ export default function NuevoPedido({ pedidos, onCerrar, onCreado }) {
     setArchivo(null)
     setPreviewUrl(null)
     setHash(null)
+    setComprobanteActual(null)
     setAviso(null)
   }
 
@@ -80,8 +83,10 @@ export default function NuevoPedido({ pedidos, onCerrar, onCreado }) {
     setGuardando(true)
     try {
       let comprobante_url = null
+      let comprobante_hash = null
 
       if (archivo) {
+        // Subir el nuevo archivo.
         const ext = (archivo.name.split('.').pop() || 'jpg').toLowerCase()
         const nombre = `${Date.now()}-${Math.random().toString(36).slice(2, 9)}.${ext}`
         const { error: errUp } = await supabase.storage
@@ -90,24 +95,40 @@ export default function NuevoPedido({ pedidos, onCerrar, onCreado }) {
         if (errUp) throw errUp
         const { data } = supabase.storage.from(BUCKET).getPublicUrl(nombre)
         comprobante_url = data.publicUrl
+        comprobante_hash = hash
+      } else if (comprobanteActual) {
+        // Conservar el comprobante que ya tenía.
+        comprobante_url = comprobanteActual
+        comprobante_hash = editando ? pedido.comprobante_hash : null
       }
 
-      const { error: errIns } = await supabase.from('pedidos').insert({
+      const payload = {
         cliente_nombre: cliente.trim(),
         direccion: direccion.trim(),
         cantidad,
         monto: Number(monto) || 0,
         comprobante_url,
-        comprobante_hash: archivo ? hash : null,
-        estado_entrega: 'pendiente',
+        comprobante_hash,
         metodo_pago: metodoPago,
-      })
-      if (errIns) throw errIns
+      }
 
-      onCreado()
+      if (editando) {
+        const { error: errUpd } = await supabase
+          .from('pedidos')
+          .update(payload)
+          .eq('id', pedido.id)
+        if (errUpd) throw errUpd
+      } else {
+        const { error: errIns } = await supabase
+          .from('pedidos')
+          .insert({ ...payload, estado_entrega: 'pendiente' })
+        if (errIns) throw errIns
+      }
+
+      onGuardado()
     } catch (err) {
       console.error(err)
-      setError('No se pudo guardar el pedido: ' + (err.message || err))
+      setError('No se pudo guardar: ' + (err.message || err))
       setGuardando(false)
     }
   }
@@ -116,7 +137,7 @@ export default function NuevoPedido({ pedidos, onCerrar, onCreado }) {
     <div className="modal-overlay" onClick={onCerrar}>
       <div className="modal-form" onClick={(e) => e.stopPropagation()}>
         <div className="modal-form-header">
-          <h2>Nuevo pedido</h2>
+          <h2>{editando ? 'Editar pedido' : 'Nuevo pedido'}</h2>
           <button className="modal-cerrar" onClick={onCerrar} aria-label="Cerrar">
             ✕
           </button>
@@ -160,7 +181,7 @@ export default function NuevoPedido({ pedidos, onCerrar, onCreado }) {
               value={cliente}
               onChange={(e) => setCliente(e.target.value)}
               placeholder="Ej: María Pérez"
-              autoFocus
+              autoFocus={!editando}
             />
           </label>
 
@@ -205,7 +226,7 @@ export default function NuevoPedido({ pedidos, onCerrar, onCreado }) {
 
           <div className="campo">
             <span>Comprobante (opcional)</span>
-            {!previewUrl ? (
+            {!mostrarPreview ? (
               <div className="upload-botones">
                 <label className="upload-btn">
                   <input
@@ -226,7 +247,7 @@ export default function NuevoPedido({ pedidos, onCerrar, onCreado }) {
               </div>
             ) : (
               <div className="upload-preview">
-                <img src={previewUrl} alt="Vista previa del comprobante" />
+                <img src={previewUrl || comprobanteActual} alt="Comprobante" />
                 <button type="button" className="btn btn-sec" onClick={quitarFoto}>
                   Quitar foto
                 </button>
@@ -248,7 +269,7 @@ export default function NuevoPedido({ pedidos, onCerrar, onCreado }) {
               Cancelar
             </button>
             <button type="submit" className="btn btn-ok" disabled={guardando}>
-              {guardando ? 'Guardando…' : 'Guardar pedido'}
+              {guardando ? 'Guardando…' : editando ? 'Guardar cambios' : 'Guardar pedido'}
             </button>
           </div>
         </form>

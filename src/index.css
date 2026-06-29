@@ -337,9 +337,14 @@ button {
 }
 .card-acciones {
   margin-top: 12px;
+  display: flex;
+  gap: 8px;
 }
 .card-acciones .btn {
-  width: 100%;
+  flex: 1;
+}
+.btn-editar {
+  flex: 0 0 auto;
 }
 
 /* ── FAB (+ Agregar) ────────────────────────────────────────── */

@@ -1,6 +1,12 @@
 import { formatoMoneda, formatoFecha } from '../lib/utils'
 
-export default function PedidoCard({ pedido, onMarcarEntregado, onRevertir, onVerComprobante }) {
+export default function PedidoCard({
+  pedido,
+  onMarcarEntregado,
+  onRevertir,
+  onEditar,
+  onVerComprobante,
+}) {
   const entregado = pedido.estado_entrega === 'entregado'
 
   return (
@@ -47,13 +53,16 @@ export default function PedidoCard({ pedido, onMarcarEntregado, onRevertir, onVe
       )}
 
       <div className="card-acciones">
+        <button className="btn btn-sec btn-editar" onClick={() => onEditar(pedido)}>
+          ✏️ Editar
+        </button>
         {entregado ? (
           <button className="btn btn-sec" onClick={() => onRevertir(pedido)}>
-            ↩ Revertir a pendiente
+            ↩ Revertir
           </button>
         ) : (
           <button className="btn btn-ok" onClick={() => onMarcarEntregado(pedido)}>
-            ✓ Marcar como entregado
+            ✓ Marcar entregado
           </button>
         )}
       </div>

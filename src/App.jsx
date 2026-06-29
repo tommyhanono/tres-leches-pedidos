@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { supabase, supabaseConfigurado } from './supabaseClient'
 import Header from './components/Header'
 import Dashboard from './components/Dashboard'
-import NuevoPedido from './components/NuevoPedido'
+import PedidoForm from './components/PedidoForm'
 import VerComprobante from './components/VerComprobante'
 
 export default function App() {
@@ -10,8 +10,24 @@ export default function App() {
   const [cargando, setCargando] = useState(true)
   const [errorCarga, setErrorCarga] = useState(null)
 
-  const [mostrarNuevo, setMostrarNuevo] = useState(false)
+  const [formAbierto, setFormAbierto] = useState(false)
+  const [pedidoEditar, setPedidoEditar] = useState(null) // null = nuevo
   const [comprobanteVer, setComprobanteVer] = useState(null)
+
+  function abrirNuevo() {
+    setPedidoEditar(null)
+    setFormAbierto(true)
+  }
+
+  function abrirEditar(pedido) {
+    setPedidoEditar(pedido)
+    setFormAbierto(true)
+  }
+
+  function cerrarForm() {
+    setFormAbierto(false)
+    setPedidoEditar(null)
+  }
 
   const cargarPedidos = useCallback(async () => {
     if (!supabaseConfigurado) return
@@ -112,19 +128,21 @@ VITE_SUPABASE_ANON_KEY=tu-anon-public-key`}
         cargando={cargando}
         onMarcarEntregado={marcarEntregado}
         onRevertir={revertirPedido}
+        onEditar={abrirEditar}
         onVerComprobante={setComprobanteVer}
       />
 
-      <button className="fab" onClick={() => setMostrarNuevo(true)}>
+      <button className="fab" onClick={abrirNuevo}>
         + Agregar
       </button>
 
-      {mostrarNuevo && (
-        <NuevoPedido
+      {formAbierto && (
+        <PedidoForm
+          pedido={pedidoEditar}
           pedidos={pedidos}
-          onCerrar={() => setMostrarNuevo(false)}
-          onCreado={() => {
-            setMostrarNuevo(false)
+          onCerrar={cerrarForm}
+          onGuardado={() => {
+            cerrarForm()
             cargarPedidos()
           }}
         />

@@ -7,6 +7,7 @@ export default function Dashboard({
   cargando,
   onMarcarEntregado,
   onRevertir,
+  onEditar,
   onVerComprobante,
 }) {
   const [filtro, setFiltro] = useState('pendiente') // 'pendiente' | 'entregado' | 'todos'
@@ -106,6 +107,7 @@ export default function Dashboard({
               pedido={p}
               onMarcarEntregado={onMarcarEntregado}
               onRevertir={onRevertir}
+              onEditar={onEditar}
               onVerComprobante={onVerComprobante}
             />
           ))
