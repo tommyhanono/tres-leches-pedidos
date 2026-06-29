@@ -10,6 +10,7 @@ export default function NuevoPedido({ pedidos, onCerrar, onCreado }) {
   const [cantidad, setCantidad] = useState(1)
   const [monto, setMonto] = useState(PRECIO_UNITARIO)
   const [montoEditado, setMontoEditado] = useState(false)
+  const [metodoPago, setMetodoPago] = useState('yappy') // 'yappy' | 'efectivo'
 
   const [archivo, setArchivo] = useState(null)
   const [previewUrl, setPreviewUrl] = useState(null)
@@ -99,6 +100,7 @@ export default function NuevoPedido({ pedidos, onCerrar, onCreado }) {
         comprobante_url,
         comprobante_hash: archivo ? hash : null,
         estado_entrega: 'pendiente',
+        metodo_pago: metodoPago,
       })
       if (errIns) throw errIns
 
@@ -120,11 +122,37 @@ export default function NuevoPedido({ pedidos, onCerrar, onCreado }) {
           </button>
         </div>
 
-        <p className="pago-info">
-          Pago por <strong>Yappy</strong> a {YAPPY_NOMBRE} · {YAPPY_NUMERO}
-        </p>
-
         <form onSubmit={guardar} className="form">
+          <div className="campo">
+            <span>Forma de pago</span>
+            <div className="metodo-selector">
+              <button
+                type="button"
+                className={`metodo-btn ${metodoPago === 'yappy' ? 'metodo-activo' : ''}`}
+                onClick={() => setMetodoPago('yappy')}
+              >
+                📱 Yappy
+              </button>
+              <button
+                type="button"
+                className={`metodo-btn ${metodoPago === 'efectivo' ? 'metodo-activo' : ''}`}
+                onClick={() => setMetodoPago('efectivo')}
+              >
+                💵 Efectivo
+              </button>
+            </div>
+          </div>
+
+          {metodoPago === 'yappy' ? (
+            <p className="pago-info">
+              Pago por <strong>Yappy</strong> a {YAPPY_NOMBRE} · {YAPPY_NUMERO}
+            </p>
+          ) : (
+            <p className="pago-info">
+              Cobro en <strong>efectivo</strong> 💵
+            </p>
+          )}
+
           <label className="campo">
             <span>Nombre del cliente *</span>
             <input
@@ -178,17 +206,24 @@ export default function NuevoPedido({ pedidos, onCerrar, onCreado }) {
           <div className="campo">
             <span>Comprobante (opcional)</span>
             {!previewUrl ? (
-              <label className="upload-zona">
-                <input
-                  type="file"
-                  accept="image/*"
-                  capture="environment"
-                  onChange={cambiarArchivo}
-                  hidden
-                />
-                <span className="upload-icono">📷</span>
-                <span>Tomar foto o elegir de la galería</span>
-              </label>
+              <div className="upload-botones">
+                <label className="upload-btn">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    capture="environment"
+                    onChange={cambiarArchivo}
+                    hidden
+                  />
+                  <span className="upload-icono">📷</span>
+                  <span>Tomar foto</span>
+                </label>
+                <label className="upload-btn">
+                  <input type="file" accept="image/*" onChange={cambiarArchivo} hidden />
+                  <span className="upload-icono">🖼️</span>
+                  <span>Elegir de galería</span>
+                </label>
+              </div>
             ) : (
               <div className="upload-preview">
                 <img src={previewUrl} alt="Vista previa del comprobante" />

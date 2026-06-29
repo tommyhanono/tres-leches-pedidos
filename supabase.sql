@@ -11,6 +11,7 @@ create table if not exists public.pedidos (
   direccion         text        not null,
   cantidad          int         not null    default 1,
   monto             numeric     not null,
+  metodo_pago       text        not null    default 'yappy',  -- 'yappy' | 'efectivo'
   comprobante_url   text,                       -- foto OPCIONAL
   comprobante_hash  text,                       -- hash perceptual (si hay foto)
   estado_entrega    text        not null    default 'pendiente',  -- 'pendiente' | 'entregado'

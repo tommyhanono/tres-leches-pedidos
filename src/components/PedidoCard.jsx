@@ -35,6 +35,9 @@ export default function PedidoCard({ pedido, onMarcarEntregado, onRevertir, onVe
 
       <div className="card-meta">
         <span>Registrado: {formatoFecha(pedido.created_at)}</span>
+        <span className="card-pago">
+          {pedido.metodo_pago === 'efectivo' ? '💵 Efectivo' : '📱 Yappy'}
+        </span>
       </div>
 
       {entregado && pedido.entregado_at && (
