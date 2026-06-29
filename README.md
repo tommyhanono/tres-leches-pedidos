@@ -10,14 +10,15 @@ editan los mismos pedidos **en tiempo real**.
 
 ## ✨ Qué hace
 
-- Pantalla **"¿Quién eres?"** con 3 botones (se guarda en `localStorage`, se puede cambiar).
+- **Sin login ni selección de usuario**: con abrir el link vas directo al dashboard. Es un
+  registro compartido del grupo.
 - **Dashboard** con contadores (pedidos, recaudado $, pendientes, entregados), filtros
   (Pendientes / Entregados / Todos), buscador por cliente y lista en tarjetas.
 - **Nuevo pedido** con cliente, dirección, cantidad, monto autocalculado (editable) y
   **foto del comprobante opcional** (cámara o galería).
 - **Detección de comprobantes duplicados** con hash perceptual (aHash) calculado en el
   navegador: avisa si una foto se parece a otra ya registrada, pero deja continuar.
-- **Marcar como entregado** (guarda quién y cuándo) y revertir a pendiente.
+- **Marcar como entregado** (guarda la fecha) y revertir a pendiente.
 - **Exportar CSV** con todos los pedidos para pasarle la cuenta a Liel.
 - **Tiempo real** con Supabase Realtime.
 
@@ -63,16 +64,10 @@ VITE_SUPABASE_URL=https://tu-proyecto.supabase.co
 VITE_SUPABASE_ANON_KEY=tu-anon-public-key
 ```
 
-## 3. Editar los 3 nombres de vendedores
+## 3. Ajustes (precio, Yappy, causa)
 
-Abre [`src/config.js`](./src/config.js) y cambia:
-
-```js
-export const VENDEDORES = ["Vendedor 1", "Vendedor 2", "Vendedor 3"];
-```
-
-En ese mismo archivo también puedes ajustar el precio (`PRECIO_UNITARIO`), los datos de
-Yappy, el texto de la causa y la sensibilidad del detector de duplicados (`UMBRAL_DUPLICADO`).
+Abre [`src/config.js`](./src/config.js) para cambiar el precio (`PRECIO_UNITARIO`), los datos
+de Yappy, el texto de la causa y la sensibilidad del detector de duplicados (`UMBRAL_DUPLICADO`).
 
 ## 4. Desplegar en Vercel
 
@@ -115,7 +110,6 @@ tres-leches-pedidos/
 │  │  ├─ ahash.js            # hash perceptual de comprobantes
 │  │  └─ utils.js            # moneda, fechas, export CSV
 │  └─ components/
-│     ├─ SelectorVendedor.jsx
 │     ├─ Header.jsx
 │     ├─ Dashboard.jsx
 │     ├─ PedidoCard.jsx

@@ -1,24 +1,17 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { supabase, supabaseConfigurado } from './supabaseClient'
-import SelectorVendedor from './components/SelectorVendedor'
 import Header from './components/Header'
 import Dashboard from './components/Dashboard'
 import NuevoPedido from './components/NuevoPedido'
 import VerComprobante from './components/VerComprobante'
 
-const LS_VENDEDOR = 'tl_vendedor'
-
 export default function App() {
-  const [vendedor, setVendedor] = useState(() => localStorage.getItem(LS_VENDEDOR) || null)
   const [pedidos, setPedidos] = useState([])
   const [cargando, setCargando] = useState(true)
   const [errorCarga, setErrorCarga] = useState(null)
 
   const [mostrarNuevo, setMostrarNuevo] = useState(false)
   const [comprobanteVer, setComprobanteVer] = useState(null)
-
-  const pedidosRef = useRef(pedidos)
-  pedidosRef.current = pedidos
 
   const cargarPedidos = useCallback(async () => {
     if (!supabaseConfigurado) return
@@ -38,7 +31,7 @@ export default function App() {
 
   // Carga inicial + suscripción Realtime.
   useEffect(() => {
-    if (!supabaseConfigurado || !vendedor) return
+    if (!supabaseConfigurado) return
 
     cargarPedidos()
 
@@ -53,24 +46,13 @@ export default function App() {
     return () => {
       supabase.removeChannel(canal)
     }
-  }, [vendedor, cargarPedidos])
-
-  function elegirVendedor(nombre) {
-    localStorage.setItem(LS_VENDEDOR, nombre)
-    setVendedor(nombre)
-  }
-
-  function cambiarVendedor() {
-    localStorage.removeItem(LS_VENDEDOR)
-    setVendedor(null)
-  }
+  }, [cargarPedidos])
 
   async function marcarEntregado(pedido) {
     const { error } = await supabase
       .from('pedidos')
       .update({
         estado_entrega: 'entregado',
-        entregado_por: vendedor,
         entregado_at: new Date().toISOString(),
       })
       .eq('id', pedido.id)
@@ -84,7 +66,7 @@ export default function App() {
   async function revertirPedido(pedido) {
     const { error } = await supabase
       .from('pedidos')
-      .update({ estado_entrega: 'pendiente', entregado_por: null, entregado_at: null })
+      .update({ estado_entrega: 'pendiente', entregado_at: null })
       .eq('id', pedido.id)
     if (error) {
       alert('No se pudo actualizar: ' + error.message)
@@ -114,15 +96,10 @@ VITE_SUPABASE_ANON_KEY=tu-anon-public-key`}
     )
   }
 
-  // ── Selector de vendedor ────────────────────────────────────
-  if (!vendedor) {
-    return <SelectorVendedor onSeleccionar={elegirVendedor} />
-  }
-
   // ── App principal ───────────────────────────────────────────
   return (
     <div className="app">
-      <Header vendedor={vendedor} onCambiarVendedor={cambiarVendedor} />
+      <Header />
 
       {errorCarga && (
         <div className="error-box error-carga">
@@ -144,7 +121,6 @@ VITE_SUPABASE_ANON_KEY=tu-anon-public-key`}
 
       {mostrarNuevo && (
         <NuevoPedido
-          vendedor={vendedor}
           pedidos={pedidos}
           onCerrar={() => setMostrarNuevo(false)}
           onCreado={() => {

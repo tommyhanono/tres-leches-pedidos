@@ -91,59 +91,6 @@ button {
   white-space: nowrap;
 }
 
-/* ── Selector de vendedor / pantalla inicial ────────────────── */
-.selector {
-  min-height: 100dvh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 24px;
-  background: linear-gradient(160deg, var(--crema-2), var(--beige));
-}
-.selector-card {
-  background: var(--blanco);
-  border-radius: var(--radio);
-  box-shadow: var(--sombra-fuerte);
-  padding: 32px 24px;
-  max-width: 420px;
-  width: 100%;
-  text-align: center;
-}
-.logo {
-  font-size: 56px;
-  line-height: 1;
-}
-.selector-card h1 {
-  font-size: 32px;
-  color: var(--cafe);
-  margin-top: 8px;
-}
-.selector-sub {
-  color: var(--caramelo-osc);
-  font-weight: 600;
-  margin: 6px 0 0;
-}
-.causa {
-  color: var(--texto-suave);
-  font-size: 14px;
-  margin: 10px 0 0;
-}
-.selector-pregunta {
-  margin: 28px 0 16px;
-  font-size: 20px;
-  color: var(--cafe);
-}
-.selector-botones {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-.btn-vendedor {
-  background: var(--caramelo);
-  color: #fff;
-  box-shadow: var(--sombra);
-}
-
 /* ── Header ─────────────────────────────────────────────────── */
 .app {
   max-width: 640px;
@@ -179,30 +126,16 @@ button {
 .header h1 {
   font-size: 21px;
 }
-.header-causa {
+.header-sub {
   margin: 2px 0 0;
-  font-size: 11px;
-  opacity: 0.85;
-  max-width: 230px;
+  font-size: 12px;
+  font-weight: 600;
+  opacity: 0.92;
 }
-.btn-cambiar {
-  background: rgba(255, 255, 255, 0.18);
-  border: 1px solid rgba(255, 255, 255, 0.35);
-  border-radius: var(--radio-chico);
-  color: #fff;
-  padding: 8px 12px;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  line-height: 1.2;
-  flex-shrink: 0;
-}
-.header-vendedor {
-  font-weight: 700;
-  font-size: 14px;
-}
-.header-cambiar-txt {
-  font-size: 11px;
+.header-causa {
+  max-width: 640px;
+  margin: 8px auto 0;
+  font-size: 12px;
   opacity: 0.85;
 }
 

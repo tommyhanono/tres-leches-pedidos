@@ -4,7 +4,7 @@ import { PRECIO_UNITARIO, YAPPY_NOMBRE, YAPPY_NUMERO, UMBRAL_DUPLICADO } from '.
 import { calcularHash, distanciaHamming } from '../lib/ahash'
 import { formatoMoneda } from '../lib/utils'
 
-export default function NuevoPedido({ vendedor, pedidos, onCerrar, onCreado }) {
+export default function NuevoPedido({ pedidos, onCerrar, onCreado }) {
   const [cliente, setCliente] = useState('')
   const [direccion, setDireccion] = useState('')
   const [cantidad, setCantidad] = useState(1)
@@ -99,7 +99,6 @@ export default function NuevoPedido({ vendedor, pedidos, onCerrar, onCreado }) {
         comprobante_url,
         comprobante_hash: archivo ? hash : null,
         estado_entrega: 'pendiente',
-        registrado_por: vendedor,
       })
       if (errIns) throw errIns
 

@@ -2,9 +2,6 @@
 //  CONFIGURACIÓN — edita estos valores cuando quieras
 // ─────────────────────────────────────────────────────────────
 
-// Los 3 vendedores. Cambia los nombres aquí.
-export const VENDEDORES = ["Vendedor 1", "Vendedor 2", "Vendedor 3"];
-
 // Precio por unidad del postre (USD).
 export const PRECIO_UNITARIO = 9.0;
 

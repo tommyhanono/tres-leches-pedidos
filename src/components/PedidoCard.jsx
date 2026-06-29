@@ -34,14 +34,12 @@ export default function PedidoCard({ pedido, onMarcarEntregado, onRevertir, onVe
       )}
 
       <div className="card-meta">
-        <span>Registró: <strong>{pedido.registrado_por}</strong></span>
-        <span>{formatoFecha(pedido.created_at)}</span>
+        <span>Registrado: {formatoFecha(pedido.created_at)}</span>
       </div>
 
-      {entregado && pedido.entregado_por && (
+      {entregado && pedido.entregado_at && (
         <div className="card-meta card-meta-entrega">
-          <span>Entregó: <strong>{pedido.entregado_por}</strong></span>
-          {pedido.entregado_at && <span>{formatoFecha(pedido.entregado_at)}</span>}
+          <span>Entregado: {formatoFecha(pedido.entregado_at)}</span>
         </div>
       )}
 

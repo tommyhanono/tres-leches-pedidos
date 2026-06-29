@@ -1,6 +1,7 @@
-import { CAUSA } from '../config'
+import { CAUSA, PRODUCTO, PRECIO_UNITARIO } from '../config'
+import { formatoMoneda } from '../lib/utils'
 
-export default function Header({ vendedor, onCambiarVendedor }) {
+export default function Header() {
   return (
     <header className="header">
       <div className="header-top">
@@ -8,14 +9,13 @@ export default function Header({ vendedor, onCambiarVendedor }) {
           <span className="header-emoji">🍰</span>
           <div>
             <h1>Tres Leches</h1>
-            <p className="header-causa">{CAUSA}</p>
+            <p className="header-sub">
+              {PRODUCTO} · {formatoMoneda(PRECIO_UNITARIO)} c/u
+            </p>
           </div>
         </div>
-        <button className="btn-cambiar" onClick={onCambiarVendedor} title="Cambiar de vendedor">
-          <span className="header-vendedor">{vendedor}</span>
-          <span className="header-cambiar-txt">cambiar</span>
-        </button>
       </div>
+      <p className="header-causa">{CAUSA}</p>
     </header>
   )
 }

@@ -36,8 +36,6 @@ export function exportarCSV(pedidos) {
     'Cantidad',
     'Monto',
     'Estado',
-    'Registrado por',
-    'Entregado por',
     'Entregado at',
     'Comprobante URL',
   ]
@@ -49,8 +47,6 @@ export function exportarCSV(pedidos) {
     p.cantidad,
     Number(p.monto).toFixed(2),
     p.estado_entrega,
-    p.registrado_por,
-    p.entregado_por || '',
     p.entregado_at ? formatoFecha(p.entregado_at) : '',
     p.comprobante_url || '',
   ])

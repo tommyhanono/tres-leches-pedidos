@@ -14,8 +14,8 @@ create table if not exists public.pedidos (
   comprobante_url   text,                       -- foto OPCIONAL
   comprobante_hash  text,                       -- hash perceptual (si hay foto)
   estado_entrega    text        not null    default 'pendiente',  -- 'pendiente' | 'entregado'
-  registrado_por    text        not null,
-  entregado_por     text,
+  registrado_por    text,                       -- (sin uso: es un registro del grupo)
+  entregado_por     text,                       -- (sin uso)
   entregado_at      timestamptz
 );
 
